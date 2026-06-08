@@ -1,0 +1,21 @@
+{
+  "name": "pdf-reader-inclass",
+  "version": "1.0.0",
+  "description": "教室电子白板 PDF 批注工具 - 离线本地部署",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win --config electron-builder.yml",
+    "setup:pdfjs": "node scripts/setup-pdfjs.js",
+    "postinstall": "node scripts/setup-pdfjs.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^25.0.0"
+  },
+  "dependencies": {
+    "pdfjs-dist": "4.8.69"
+  }
+}

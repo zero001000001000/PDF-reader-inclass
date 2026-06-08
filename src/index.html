@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline';
+               img-src 'self' data: blob:; font-src 'self' data:; worker-src 'self' blob: 'unsafe-inline';">
+  <title>PDF-reader-inclass</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- 动态加载 pdf.js 离线 ES module -->
+  <script>
+    window.__pdfjsReady = (async () => {
+      const mod = await import('../lib/pdfjs/pdf.min.mjs');
+      window.pdfjsLib = mod;
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ========== 主工具栏（顶部） ========== -->
+  <div id="toolbar">
+    <!-- 文件操作 -->
+    <button id="btn-open" class="tool-btn" title="打开 PDF">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+      </svg>
+      <span>打开</span>
+    </button>
+    <button id="btn-close-file" class="tool-btn" title="关闭当前文件">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 6L6 18M6 6l12 12"/>
+      </svg>
+      <span>关闭</span>
+    </button>
+
+    <div class="tool-separator"></div>
+
+    <!-- 工具模式 -->
+    <button id="btn-pen" class="tool-btn active" title="笔">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+      </svg>
+      <span>笔</span>
+    </button>
+    <button id="btn-eraser" class="tool-btn" title="橡皮擦（区域擦除）">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="7"/>
+        <path d="M18 6l-12 12M6 6l12 12"/>
+      </svg>
+      <span>橡皮</span>
+    </button>
+    <button id="btn-scroll" class="tool-btn" title="手型滚动">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l3 3-3-3M19 15l3-3-3-3M2 12h20M12 2v20"/>
+      </svg>
+      <span>手型</span>
+    </button>
+
+    <div class="tool-separator"></div>
+
+    <!-- 颜色选择 -->
+    <div id="color-picker" class="tool-group">
+      <button class="color-btn active" data-color="#FF0000" style="background:#FF0000" title="红色"></button>
+      <button class="color-btn" data-color="#0055FF" style="background:#0055FF" title="蓝色"></button>
+      <button class="color-btn" data-color="#00AA00" style="background:#00AA00" title="绿色"></button>
+      <button class="color-btn" data-color="#000000" style="background:#000000" title="黑色"></button>
+      <button class="color-btn" data-color="#FFD700" style="background:#FFD700" title="黄色"></button>
+      <button class="color-btn" data-color="#FFFFFF" style="background:#FFFFFF; border-color:#ccc" title="白色"></button>
+    </div>
+
+    <div class="tool-separator"></div>
+
+    <!-- 线宽 -->
+    <div id="width-picker" class="tool-group">
+      <button class="width-btn" data-width="2" title="细">细</button>
+      <button class="width-btn active" data-width="5" title="中">中</button>
+      <button class="width-btn" data-width="10" title="粗">粗</button>
+    </div>
+
+    <div class="tool-separator"></div>
+
+    <!-- 操作 -->
+    <button id="btn-undo" class="tool-btn" title="撤销">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 10h13a4 4 0 010 8H7"/>
+        <path d="M7 6l-4 4 4 4"/>
+      </svg>
+      <span>撤销</span>
+    </button>
+    <button id="btn-redo" class="tool-btn" title="重做">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 10H8a4 4 0 000 8h9"/>
+        <path d="M17 6l4 4-4 4"/>
+      </svg>
+      <span>重做</span>
+    </button>
+    <button id="btn-clear" class="tool-btn" title="清除当前页所有批注">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+      </svg>
+      <span>清页</span>
+    </button>
+
+    <div class="tool-separator"></div>
+
+    <!-- 缩放 -->
+    <button id="btn-zoom-out" class="tool-btn" title="缩小">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6"/>
+      </svg>
+    </button>
+    <span id="zoom-level">100%</span>
+    <button id="btn-zoom-in" class="tool-btn" title="放大">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35M8 11h6M11 8v6"/>
+      </svg>
+    </button>
+    <button id="btn-zoom-fit" class="tool-btn" title="适应窗口">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ========== PDF 显示区域（长屏滚动） ========== -->
+  <div id="canvas-container" class="tool-pen">
+    <div id="eraser-indicator" class="hidden" aria-hidden="true"></div>
+    <div id="view-stage">
+    <div id="scroll-container">
+      <!-- pdf-viewer 动态插入 .page-wrapper > canvas.pdf-page + canvas.ink-page -->
+    </div>
+    </div>
+
+    <!-- 欢迎遮罩 -->
+    <div id="welcome-overlay">
+      <svg viewBox="0 0 80 80" width="80" height="80" fill="none" stroke="#4a90d9" stroke-width="2">
+        <path d="M10 20h60v50H10z"/>
+        <path d="M20 10h40v10H20z"/>
+        <path d="M30 35l10 10 16-18"/>
+      </svg>
+      <h2>打开 PDF 文件开始批注</h2>
+      <p>点击上方"打开"按钮</p>
+    </div>
+  </div>
+
+  <!-- ========== 底部翻页栏 ========== -->
+  <div id="page-bar">
+    <button id="btn-prev" class="tool-btn" title="上一页">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <span id="page-indicator">— / —</span>
+    <button id="btn-next" class="tool-btn" title="下一页">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ========== 保存确认弹窗（退出文件时） ========== -->
+  <div id="save-dialog" class="dialog-overlay hidden">
+    <div class="dialog-box">
+      <p id="save-dialog-title">批注尚未保存，是否保存？</p>
+      <p class="dialog-sub">选择「不保存」将放弃本次未保存的修改</p>
+      <div class="dialog-btns">
+        <button id="save-discard" class="dialog-btn dialog-btn-default">不保存</button>
+        <button id="save-cancel" class="dialog-btn">取消</button>
+        <button id="save-confirm" class="dialog-btn primary">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 清页确认弹窗 ========== -->
+  <div id="clear-dialog" class="dialog-overlay hidden">
+    <div class="dialog-box">
+      <p>确定要清除当前页所有批注吗？</p>
+      <p class="dialog-sub">可通过「撤销」恢复</p>
+      <div class="dialog-btns">
+        <button id="clear-cancel" class="dialog-btn">取消</button>
+        <button id="clear-confirm" class="dialog-btn danger">确定清除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 按依赖顺序加载模块（IIFE 暴露全局变量） -->
+  <script src="js/pdf-viewer.js"></script>
+  <script src="js/ink-engine.js"></script>
+  <script src="js/gesture-manager.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/save-prompt.js"></script>
+  <script src="js/toolbar.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+appId: com.pdfreader.inclass
+productName: PDF-reader-inclass
+copyright: Copyright © 2026
+
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - electron/**/*
+  - src/**/*
+  - lib/**/*
+  - package.json
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  shortcutName: PDF-reader-inclass
+  license: LICENSE.txt
+
+# 教室场景：禁用自动更新
+publish: null
