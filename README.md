@@ -1,158 +1,160 @@
-# PDF-reader-inclass — 教室电子白板 PDF 批注工具
+# PDF-reader-inclass — Classroom Whiteboard PDF Annotation Tool
 
-面向教室场景的 **离线本地** PDF 阅读与手写批注应用。基于 Electron 构建，针对触摸屏电子白板优化，支持触控笔压感、双指缩放与手掌误触过滤，无需联网即可稳定运行。
+> **中文文档**：[README-cn.md](README-cn.md)
 
-## 适用场景
+An **offline, local-first** PDF reader and handwriting annotation app built for classroom use. Powered by Electron and optimized for touch-screen interactive whiteboards, with stylus pressure support, pinch-to-zoom, and palm-rejection — no internet required.
 
-- 课堂教学：在课件 PDF 上实时圈画、标注重点
-- 会议演示：投影大屏上手写补充说明
-- 离线环境：内网机房、无网络教室等受限网络场景
+## Use Cases
 
-## 功能特性
+- **Classroom teaching** — Circle, highlight, and annotate slides in real time
+- **Presentations** — Add handwritten notes on a projected display
+- **Offline environments** — Labs, intranets, and classrooms with no network access
 
-### PDF 阅读
+## Features
 
-- 基于 **pdf.js 4.x** 本地渲染，无 CDN 依赖
-- **长文档纵向滚动**：所有页面连续排列，滚动浏览更自然
-- **视口内按需渲染**：仅渲染可见区域及缓冲页，大文档流畅不卡顿
-- 缩放范围 25%–800%，支持适应窗口、双指捏合、滚轮缩放（以光标/锚点为中心）
+### PDF Reading
 
-### 手写批注
+- Renders locally with **pdf.js 4.x** — no CDN dependencies
+- **Continuous vertical scrolling** — all pages in one scrollable flow
+- **Viewport-based rendering** — only visible pages (plus a buffer) are drawn for smooth performance on large documents
+- Zoom range 25%–800%; fit-to-window, pinch-to-zoom, and scroll-wheel zoom (anchored to cursor/focal point)
 
-- **六色可调**：红 / 蓝 / 绿 / 黑 / 黄 / 白，三档线宽（细 / 中 / 粗）
-- **压感支持**：自动检测触控笔或手指压力，映射线宽变化
-- **笔迹翻页跟随**：每页独立保存笔迹，翻页自动切换；滚动时页码指示器同步更新
-- **撤销 / 重做**：完整操作历史栈，支持笔画、擦除、清页
-- **区域擦除**：圆形橡皮擦（可见范围圈），可分割笔画，擦除可撤销
-- **一键清页**：清除当前页所有批注（带确认弹窗，可撤销恢复）
+### Handwriting Annotations
 
-### 交互与手势
+- **Six colors** — red, blue, green, black, yellow, white; three stroke widths (thin / medium / thick)
+- **Pressure sensitivity** — detects stylus or finger pressure and maps it to stroke width
+- **Per-page ink** — annotations are stored per page and switch automatically when you change pages; the page indicator updates while scrolling
+- **Undo / redo** — full history stack for strokes, erasures, and page clears
+- **Region eraser** — circular eraser with visible radius; can split strokes; erasures are undoable
+- **Clear page** — remove all annotations on the current page (with confirmation; undoable)
 
-| 操作 | 触摸屏 | 鼠标 |
-|------|--------|------|
-| 书写 / 擦除 | 单指（笔模式 / 橡皮模式） | 左键拖动 |
-| 平移视图 | 手型模式下单指拖动（带惯性滑动） | 手型模式下拖动 |
-| 缩放 | 双指捏合 | 滚轮（以光标为中心） |
-| 翻页 | 滚动浏览 或 底部翻页栏 | 同上 |
+### Interaction & Gestures
 
-- **手掌误触过滤**：大面积触点自动忽略
-- **书写指针捕获**：书写过程中减少意外中断
-- **大按钮 UI**：深色主题，适合远距离观看与触摸操作
+| Action | Touchscreen | Mouse |
+|--------|-------------|-------|
+| Draw / erase | Single finger (pen or eraser mode) | Left-button drag |
+| Pan view | Single-finger drag in hand mode (with inertia) | Drag in hand mode |
+| Zoom | Pinch | Scroll wheel (centered on cursor) |
+| Change page | Scroll or bottom page bar | Same as touch |
 
-### 文件与保存
+- **Palm rejection** — large contact areas are ignored automatically
+- **Pointer capture while drawing** — reduces accidental interruptions
+- **Large-button UI** — dark theme, readable from a distance and easy to tap
 
-- **手动保存模式**：书写过程不自动写入磁盘
-- 关闭文件、打开新文件或退出应用时，若有未保存修改会弹出确认框（保存 / 不保存 / 取消）
-- 窗口标题在存在未保存修改时显示 `*` 标记
-- 再次打开同一 PDF 时，自动加载上次 **已保存** 的批注
+### Files & Saving
 
-## 技术栈
+- **Manual save** — nothing is written to disk while you draw
+- When closing a file, opening another, or quitting, unsaved changes trigger a prompt (Save / Don’t Save / Cancel)
+- Window title shows a `*` when there are unsaved changes
+- Reopening the same PDF loads the last **saved** annotations automatically
 
-| 层 | 技术 |
-|----|------|
-| 桌面框架 | Electron 28.x |
-| PDF 渲染 | pdf.js 4.8.x（离线包，内嵌于 `lib/pdfjs/`） |
-| 笔迹绘制 | HTML5 Canvas + Pointer Events |
-| 打包分发 | electron-builder → Windows NSIS 安装包 |
-| UI 样式 | 原生 CSS，深色主题，触摸优化 |
+## Tech Stack
 
-## 系统要求
+| Layer | Technology |
+|-------|------------|
+| Desktop shell | Electron 28.x |
+| PDF rendering | pdf.js 4.8.x (offline bundle in `lib/pdfjs/`) |
+| Ink drawing | HTML5 Canvas + Pointer Events |
+| Packaging | electron-builder → Windows NSIS installer |
+| UI | Vanilla CSS, dark theme, touch-optimized |
 
-| 环境 | 要求 |
-|------|------|
-| 教室电脑（运行） | Windows 10 x64，Intel i3+，8 GB RAM |
-| 开发机 | Node.js 18+，npm 9+（仅首次 `npm install` 需网络） |
+## System Requirements
 
-## 快速开始（开发）
+| Environment | Requirements |
+|---------------|--------------|
+| Classroom PC (runtime) | Windows 10 x64, Intel i3+, 8 GB RAM |
+| Dev machine | Node.js 18+, npm 9+ (network only needed for first `npm install`) |
+
+## Quick Start (Development)
 
 ```bash
-git clone <你的仓库地址>
+git clone <your-repo-url>
 cd PDF-reader-inclass
-npm install              # 首次安装，自动下载 pdf.js 离线包和 Electron
-npm start                # 启动应用
+npm install              # First run: downloads pdf.js offline bundle and Electron
+npm start                # Launch the app
 ```
 
-> `npm install` 会通过 `postinstall` 脚本将 pdf.js 提取到 `lib/pdfjs/`，该目录不纳入版本控制。
+> `npm install` runs a `postinstall` script that extracts pdf.js into `lib/pdfjs/`. That directory is not tracked in version control.
 
-> **注意**：`npm install` 需要从 GitHub 下载 Electron 二进制文件（约 100 MB）。  
-> 如遇网络问题，可使用国内镜像：
+> **Note:** `npm install` downloads the Electron binary from GitHub (~100 MB).  
+> If you have network issues, use a mirror (example for China):
 > ```bash
 > set ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/
 > npm install
 > ```
 
-## 打包部署（生产）
+## Build & Deploy (Production)
 
 ```bash
-npm run build:win        # 输出到 dist/ 目录
+npm run build:win        # Output goes to dist/
 ```
 
-生成文件：
+Artifacts:
 
-- `dist/PDF-reader-inclass Setup 1.0.0.exe` — NSIS 安装包（约 140 MB）
-- `dist/win-unpacked/` — 绿色便携版目录
+- `dist/PDF-reader-inclass Setup 1.0.0.exe` — NSIS installer (~140 MB)
+- `dist/win-unpacked/` — portable unpacked build
 
-安装后即可离线使用，无需任何网络。教室场景下已禁用自动更新检查。
+After installation, the app runs fully offline. Auto-update checks are disabled for classroom deployments.
 
-## 项目结构
+## Project Structure
 
 ```
 PDF-reader-inclass/
 ├── electron/
-│   ├── main.js              # 主进程（窗口管理、文件对话框、批注读写）
-│   └── preload.js           # 安全桥接（contextBridge）
+│   ├── main.js              # Main process (window, file dialogs, annotation I/O)
+│   └── preload.js           # Secure bridge (contextBridge)
 ├── src/
-│   ├── index.html           # 主页面
-│   ├── css/styles.css       # 触摸优化样式
+│   ├── index.html           # Main page
+│   ├── css/styles.css       # Touch-optimized styles
 │   └── js/
-│       ├── app.js           # 应用入口（模块装配、保存流程）
-│       ├── pdf-viewer.js    # PDF 渲染（按需加载可见页、缩放平移）
-│       ├── ink-engine.js    # 笔迹引擎（笔画、擦除、历史栈）
-│       ├── gesture-manager.js  # 手势管理（Pointer Events、滚轮缩放）
-│       ├── toolbar.js       # 工具栏交互
-│       ├── save-prompt.js   # 保存确认弹窗
-│       └── storage.js       # 批注持久化（仅手动保存时调用）
-├── lib/pdfjs/               # pdf.js 离线包（postinstall 时生成）
+│       ├── app.js           # App entry (module wiring, save flow)
+│       ├── pdf-viewer.js    # PDF rendering (lazy pages, zoom/pan)
+│       ├── ink-engine.js    # Ink engine (strokes, erase, history)
+│       ├── gesture-manager.js  # Gestures (Pointer Events, wheel zoom)
+│       ├── toolbar.js       # Toolbar interactions
+│       ├── save-prompt.js   # Save confirmation dialog
+│       └── storage.js       # Annotation persistence (manual save only)
+├── lib/pdfjs/               # pdf.js offline bundle (generated by postinstall)
 ├── scripts/
-│   └── setup-pdfjs.js       # pdf.js 离线包提取脚本
-├── build/                   # 打包资源（图标等）
+│   └── setup-pdfjs.js       # pdf.js extraction script
+├── build/                   # Build assets (icons, etc.)
 ├── package.json
-├── electron-builder.yml     # 打包配置
-└── LICENSE.txt              # MIT 许可证
+├── electron-builder.yml     # Packaging config
+└── LICENSE.txt              # MIT license
 ```
 
-## 使用说明
+## How to Use
 
-1. 启动应用后，点击顶部 **「打开」** 选择 PDF 文件
-2. 选择笔的颜色和粗细，在画布上书写批注
-3. 点击 **「橡皮」** 切换到擦除模式，在笔迹上拖动进行区域擦除
-4. 点击 **「手型」** 切换平移模式，单指/拖动可上下左右移动视图
-5. 双指捏合缩放，或使用工具栏 **缩小 / 放大 / 适应窗口** 按钮
-6. 底部翻页栏切换页码，或直接滚动浏览，笔迹与页码自动跟随
-7. 点击 **「撤销」** / **「重做」** 回退或恢复操作
-8. 点击 **「清页」** 清除当前页所有批注（需确认，可撤销）
-9. 点击 **「关闭」**、打开其他文件或退出应用时，若有未保存批注会询问是否保存
-10. 下次打开同一 PDF 时，自动加载上次已保存的批注
+1. Launch the app and click **Open** to select a PDF
+2. Pick pen color and width, then draw on the canvas
+3. Click **Eraser** to erase by dragging over strokes
+4. Click **Hand** to pan — drag to move the view in any direction
+5. Pinch to zoom, or use **Zoom out / Zoom in / Fit window** on the toolbar
+6. Use the bottom page bar or scroll; ink and page indicator follow automatically
+7. **Undo** / **Redo** to step through changes
+8. **Clear page** removes all annotations on the current page (confirmed; undoable)
+9. **Close**, open another file, or quit — you’ll be asked to save if there are unsaved annotations
+10. Reopen the same PDF to load the last saved annotations
 
-## 批注存储
+## Annotation Storage
 
-批注数据以 JSON 格式保存在本机用户目录，与 PDF 原文件分离：
+Annotations are stored as JSON on the local machine, separate from the PDF file:
 
 ```
-%APPDATA%\pdf-reader-inclass\annotations\<PDF路径哈希>.json
+%APPDATA%\pdf-reader-inclass\annotations\<hash-of-pdf-path>.json
 ```
 
-- 按 PDF 文件的完整路径生成唯一文件名，同一文件在不同路径下批注互不影响
-- 删除上述 JSON 文件即可清除对应 PDF 的已保存批注
-- PDF 原文件不会被修改
+- Filename is derived from the PDF’s full path; the same file at different paths keeps separate annotation sets
+- Delete the JSON file to clear saved annotations for that PDF
+- The original PDF is never modified
 
-## 离线保障
+## Offline Guarantees
 
-- pdf.js 完整离线包嵌入（`lib/pdfjs/`），无 CDN 引用
-- 字体使用 Windows 系统字体（SimSun、Microsoft YaHei），无外部下载
-- 所有图标为内联 SVG，无图片资源文件
-- 打包后将 Electron 运行时一并嵌入，部署目录可直接运行
+- Full pdf.js bundle embedded in `lib/pdfjs/` — no CDN
+- System fonts (SimSun, Microsoft YaHei) — no font downloads
+- Inline SVG icons — no external image assets
+- Electron runtime bundled in the installer — run from the deploy folder without extra setup
 
-## 许可证
+## License
 
-本项目采用 [MIT License](LICENSE.txt)。
+This project is licensed under the [MIT License](LICENSE.txt).
